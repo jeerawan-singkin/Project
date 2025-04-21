@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login Page</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    body {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(to right, #b8d2f2, #3cc7ef);
+    }
+
+    .login-container {
+      background: rgba(255, 255, 255, 0.1);
+      width: 900px;
+      height: 500px;
+      display: flex;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .left-panel {
+      flex: 1;
+      background: transparent;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      border-right: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .left-panel h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    .left-panel span {
+      font-size: 14px;
+    }
+
+    .right-panel {
+      flex: 1;
+      background: transparent;
+      padding: 60px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      color: white;
+    }
+
+    .right-panel .icon {
+      font-size: 40px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 12px 40px 12px 40px;
+      border: none;
+      border-radius: 5px;
+      background-color: rgba(255,255,255,0.3);
+      color: white;
+      font-size: 16px;
+    }
+
+    .input-group i {
+      position: absolute;
+      top: 50%;
+      left: 12px;
+      transform: translateY(-50%);
+      color: white;
+    }
+
+    .remember-forgot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    .remember-forgot input {
+      margin-right: 5px;
+    }
+
+    .login-btn {
+      background-color: #005eb8;
+      padding: 12px;
+      border: none;
+      color: white;
+      font-size: 18px;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .login-btn:hover {
+      background-color: #004a94;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <div class="left-panel">
+      <h1>BACKGROUND</h1>
+      <span>VECTOR DESIGN eps.10</span>
+    </div>
+
+    <div class="right-panel">
+      <div class="icon"><i class="bi bi-people"></i></div>
+
+      <div class="input-group">
+        <i class="bi bi-person"></i>
+        <input type="text" placeholder="Username" id="username">
+      </div>
+
+      <div class="input-group">
+        <i class="bi bi-lock"></i>
+        <input type="password" placeholder="Password" id="password">
+      </div>
+
+      <div class="remember-forgot">
+        <label><input type="checkbox"> Remember me</label>
+        <a href="#" style="color: white;"><i class="bi bi-envelope"></i> Forgot Password</a>
+      </div>
+
+      <button class="login-btn" id="login-btn">LOGIN</button>
+    </div>
+  </div>
+
+  <!-- 🔹 Firebase + Firestore Login Script -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB-W0d0AB7O6Lz2K8jKQ-OHv5zDEUFmECQ",
+      authDomain: "projectpea-24217.firebaseapp.com",
+      projectId: "projectpea-24217",
+      storageBucket: "projectpea-24217.firebasestorage.app",
+      messagingSenderId: "336666334550",
+      appId: "1:336666334550:web:e5fa452735744f8c2632f7",
+      measurementId: "G-EZJQ1ZW7BQ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function login() {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      if (!username || !password) {
+        alert("กรุณากรอก Username และ Password");
+        return;
+      }
+
+      const q = query(
+        collection(db, "admin_users"),
+        where("username", "==", username),
+        where("password", "==", password)
+      );
+
+      const querySnapshot = await getDocs(q);
+      if (!querySnapshot.empty) {
+        const user = querySnapshot.docs[0].data();
+        if (user.role === "admin") {
+          alert("✅ Login สำเร็จ! ยินดีต้อนรับแอดมิน");
+          window.location.href = "/admin/dashboard.html";
+        } else {
+          alert("✅ Login สำเร็จ แต่ไม่ใช่แอดมิน");
+        }
+      } else {
+        alert("❌ Username หรือ Password ไม่ถูกต้อง");
+      }
+    }
+
+    document.getElementById("login-btn").addEventListener("click", login);
+  </script>
+
+</body>
+</html>
