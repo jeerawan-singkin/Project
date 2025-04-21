@@ -10,6 +10,7 @@
       box-sizing: border-box;
       font-family: 'Prompt', sans-serif;
     }
+
     body {
       margin: 0;
       padding: 0;
@@ -58,10 +59,31 @@
       font-weight: bold;
     }
 
+    .filter-area {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .filter-area select {
+      padding: 8px 12px;
+      font-size: 14px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    .table-chart-wrapper {
+      display: flex;
+      gap: 40px;
+      margin-top: 30px;
+      align-items: flex-start;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
       background-color: white;
       border-radius: 12px;
       overflow: hidden;
@@ -93,32 +115,14 @@
     .inprogress { background-color: #7c58b3; }
     .done { background-color: #51b181; }
 
-    .filter-area {
-      margin-top: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .filter-area select {
-      padding: 8px 12px;
-      font-size: 14px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-
-    .pie-chart {
-      width: 250px;
-      height: 250px;
-      background: conic-gradient(#a27ee7 0% 33%, #7c58b3 33% 66%, #51b181 66% 100%);
-      border-radius: 50%;
-      margin-left: auto;
-      margin-top: 20px;
+    canvas {
+      max-width: 250px;
+      max-height: 250px;
     }
 
     .legend {
-      margin-top: 10px;
+      margin-top: 20px;
+      text-align: left;
     }
 
     .legend div {
@@ -150,6 +154,7 @@
 
   <div class="container">
 
+    <!-- Status Summary -->
     <div class="status-boxes">
       <div class="status-box">
         <div class="status-title">รอดำเนินการ</div>
@@ -165,6 +170,7 @@
       </div>
     </div>
 
+    <!-- Filter + Table & Chart -->
     <div class="filter-area">
       <h3>คำขอล่าสุด</h3>
       <select>
@@ -174,61 +180,95 @@
         <option>เสร็จสิ้น</option>
       </select>
     </div>
-//กรอกข้อมูล ของผู้ขอความช่วยเหลือ//
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>วันที่</th>
-          <th>ผู้ยื่นคำขอ</th>
-          <th>ที่อยู่</th>
-          <th>หอร่า</th>
-          <th>สถานะ</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>1029</td>
-          <td>23 ส.ค. 66</td>
-          <td>สบาย</td>
-          <td>หมู่ 3</td>
-          <td>หมู่ 3 ต.เส.ทรี</td>
-          <td><span class="tag pending">รอดำเนินการ</span></td>
-        </tr>
-        <tr>
-          <td>1028</td>
-          <td>22 ส.ค. 66</td>
-          <td>เฟื่องครี</td>
-          <td>หมู่แลงคี</td>
-          <td>หมู่ 3 ต.เบอจ์</td>
-          <td><span class="tag inprogress">กำลังดำเนินการ</span></td>
-        </tr>
-        <tr>
-          <td>1027</td>
-          <td>21 ส.ค. 66</td>
-          <td>วาสนา</td>
-          <td>หมู่ 7</td>
-          <td>หมู่ 4 ต.ท่าเสา</td>
-          <td><span class="tag inprogress">กำลังดำเนินการ</span></td>
-        </tr>
-        <tr>
-          <td>1026</td>
-          <td>20 ส.ค. 66</td>
-          <td>อภิวัชร์</td>
-          <td>หมู่ 4</td>
-          <td>หมู่ 5 ต.บางบง</td>
-          <td><span class="tag done">เสร็จสิ้น</span></td>
-        </tr>
-      </tbody>
-    </table>
 
-    <div class="pie-chart"></div>
-    <div class="legend">
-      <div><span class="lg-pending"></span>รอดำเนินการ</div>
-      <div><span class="lg-inprogress"></span>กำลังดำเนินการ</div>
-      <div><span class="lg-done"></span>เสร็จสิ้น</div>
+    <div class="table-chart-wrapper">
+
+      <!-- ตาราง -->
+      <div style="flex: 2;">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>วันที่</th>
+              <th>ผู้ยื่นคำขอ</th>
+              <th>ที่อยู่</th>
+              <th>หอร่า</th>
+              <th>สถานะ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1029</td>
+              <td>23 ส.ค. 66</td>
+              <td>วัชระ</td>
+              <td>หมู่ 3</td>
+              <td>หมู่ 3 ต.เส.ทรี</td>
+              <td><span class="tag pending">รอดำเนินการ</span></td>
+            </tr>
+            <tr>
+              <td>1028</td>
+              <td>22 ส.ค. 66</td>
+              <td>ห้างหุ้นส่วนจำกัด โชคเจริญ</td>
+              <td>หมู่แลงคี</td>
+              <td>หมู่ 3 ต.เบอจ์</td>
+              <td><span class="tag inprogress">กำลังดำเนินการ</span></td>
+            </tr>
+            <tr>
+              <td>1027</td>
+              <td>21 ส.ค. 66</td>
+              <td>วาสนา</td>
+              <td>หมู่ 7</td>
+              <td>หมู่ 4 ต.ท่าเสา</td>
+              <td><span class="tag inprogress">กำลังดำเนินการ</span></td>
+            </tr>
+            <tr>
+              <td>1026</td>
+              <td>20 ส.ค. 66</td>
+              <td>อภิวัชร์</td>
+              <td>หมู่ 4</td>
+              <td>หมู่ 5 ต.บางบง</td>
+              <td><span class="tag done">เสร็จสิ้น</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- กราฟ -->
+      <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+        <canvas id="statusChart" width="250" height="250"></canvas>
+        <div class="legend">
+          <div><span class="lg-pending"></span> รอดำเนินการ</div>
+          <div><span class="lg-inprogress"></span> กำลังดำเนินการ</div>
+          <div><span class="lg-done"></span> เสร็จสิ้น</div>
+        </div>
+      </div>
+
     </div>
   </div>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const ctx = document.getElementById('statusChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['รอดำเนินการ', 'กำลังดำเนินการ', 'เสร็จสิ้น'],
+        datasets: [{
+          data: [1, 2, 1], // ✅ ปรับจำนวนตามข้อมูลจริง
+          backgroundColor: ['#a27ee7', '#7c58b3', '#51b181'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: false,
+        plugins: {
+          legend: { display: false }
+        },
+        cutout: '65%'
+      }
+    });
+  </script>
 
 </body>
 </html>
