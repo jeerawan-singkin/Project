@@ -19,7 +19,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      background: linear-gradient(to right, #b8d2f2, #3cc7ef);
+      background: linear-gradient(to right, #bd81cd, #d78af1);
     }
 
     .login-container {
@@ -104,7 +104,7 @@
     }
 
     .login-btn {
-      background-color: #005eb8;
+      background-color: #84046f;
       padding: 12px;
       border: none;
       color: white;
@@ -123,8 +123,8 @@
 
   <div class="login-container">
     <div class="left-panel">
-      <h1>BACKGROUND</h1>
-      <span>VECTOR DESIGN eps.10</span>
+      <h1>WELCOME</h1>
+      <span>ยินดีต้อนรับ</span>
     </div>
 
     <div class="right-panel">
@@ -167,6 +167,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
+//login//
     async function login() {
       const username = document.getElementById("username").value.trim();
       const password = document.getElementById("password").value.trim();
@@ -177,11 +178,12 @@
       }
 
       const q = query(
-        collection(db, "admin_users"),
+        collection(db, "admin"),
         where("username", "==", username),
         where("password", "==", password)
       );
 
+//เงื่อนไขของการใส่รหัส//
       const querySnapshot = await getDocs(q);
       if (!querySnapshot.empty) {
         const user = querySnapshot.docs[0].data();
