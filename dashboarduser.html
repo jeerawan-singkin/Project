@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>แจ้งซ่อมปัญหาไฟฟ้า</title>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet">
+  <style>
+    * { box‑sizing:border‑box; font‑family:'Prompt',sans-serif; }
+    body { margin:0; padding:20px; background:#f6f1f9; }
+    .main {
+      display:flex; gap:30px;
+      justify-content:center; flex-wrap:wrap;
+    }
+    .card {
+      background:#f0ddff; padding:30px;
+      border-radius:20px; width:100%; max-width:480px;
+      box-shadow:0 0 10px rgba(0,0,0,0.05); flex:1;
+    }
+    .card h2 { text-align:center; margin-bottom:25px; color:#4d2772; }
+    .card input, .card textarea, .card button {
+      width:100%; padding:12px; margin-bottom:15px;
+      border:none; border-radius:10px; font-size:14px;
+    }
+    .card input[type=file] { padding:8px; background:#fff; }
+    .card button {
+      background:#7a4dcc; color:#fff; font-weight:bold;
+      cursor:pointer; transition:background .2s;
+    }
+    .card button:hover { background:#5f3aa7; }
+    .link {
+      text-align:center; margin-top:10px;
+      font-size:14px; color:#4d2772;
+      text-decoration:underline; cursor:pointer;
+    }
+    .status-list {
+      display:flex; flex-direction:column; gap:12px; margin-top:10px;
+    }
+    .status-item {
+      background:#fff; border-radius:12px;
+      padding:14px; box-shadow:0 1px 5px rgba(0,0,0,0.05);
+    }
+    .status-date {
+      font-size:13px; color:#444;
+      display:flex; justify-content:space-between;
+      align-items:center; flex-wrap:wrap; gap:6px;
+    }
+    .status-desc { font-size:15px; margin:8px 0; }
+    .status-addr { font-size:13px; color:#666; }
+    .status-badge {
+      padding:4px 12px; border-radius:20px;
+      font-size:13px; color:#fff; white-space:nowrap;
+    }
+    .badge-pending    { background:#7a4dcc; }
+    .badge-inprogress { background:#51b181; }
+    .badge-done       { background:#3c9d9b; }
+    @media(max-width:768px){
+      .card { max-width:100%; padding:20px; }
+      .card h2 { font-size:18px; }
+      .status-date { font-size:14px; }
+      .status-badge { font-size:12px; padding:4px 10px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="main">
+    <!-- ฟอร์มแจ้งซ่อม -->
+    <div class="card">
+      <h2>แจ้งซ่อมปัญหาไฟฟ้า</h2>
+      <input type="text"    id="report-name" placeholder="ชื่อผู้แจ้ง">
+      <input type="tel"     id="report-phone" placeholder="เบอร์ติดต่อ (10 หลัก)" maxlength="10">
+      <textarea id="report-desc" placeholder="รายละเอียดเพิ่มเติม" rows="3"></textarea>
+      <input type="text"    id="report-addr" placeholder="ที่อยู่ (หมู่บ้าน/ตำบล)">
+      <input type="file"    id="report-file">
+      <button id="report-btn">ส่งคำร้อง</button>
+      <div class="link" id="to-status">ตรวจสอบสถานะคำร้องของฉัน</div>
+    </div>
+
+    <!-- ตรวจสอบสถานะ -->
+    <div class="card" id="status-card">
+      <h2>ตรวจสอบสถานะคำร้อง</h2>
+      <input type="tel" id="status-phone" placeholder="กรอกเบอร์โทรเพื่อค้นหา">
+      <div class="status-list" id="status-list">
+        <!-- JS จะเติมรายการที่นี่ -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import {
+      getFirestore, collection, addDoc,
+      getDocs, query, where, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+    
+    // Config โปรเจกต์ Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyB-W0d0AB7O6Lz2K8jKQ-OHv5zDEUFmECQ",
+      authDomain: "projectpea-24217.firebaseapp.com",
+      projectId: "projectpea-24217",
+      storageBucket: "projectpea-24217.firebasestorage.app",
+      messagingSenderId: "336666334550",
+      appId: "1:336666334550:web:e5fa452735744f8c2632f7"
+    };
+
+    // Initialize Firebase + Firestore
+    const app = initializeApp(firebaseConfig);
+    const db  = getFirestore(app);
+
+    // ส่งคำร้อง
+    async function sendReport() {
+      const name  = document.getElementById("report-name").value.trim();
+      const phone = document.getElementById("report-phone").value.trim();
+      const desc  = document.getElementById("report-desc").value.trim();
+      const addr  = document.getElementById("report-addr").value.trim();
+
+      if (!name || phone.length!==10 || !desc || !addr) {
+        return alert("กรุณากรอกทุกช่องให้ครบถ้วน");
+      }
+
+      try {
+        await addDoc(collection(db, "repair_requests"), {
+          name,
+          phone,
+          description: desc,
+          address: addr,
+          date: new Date().toLocaleDateString("th-TH", {
+            day:"2-digit", month:"short", year:"2-digit"
+          }),
+          status: "รอดำเนินการ",
+          createdAt: serverTimestamp()
+        });
+        alert("ส่งคำร้องเรียบร้อยแล้ว");
+        // เคลียร์ฟอร์ม
+        ["report-name","report-phone","report-desc","report-addr","report-file"]
+        .forEach(id => document.getElementById(id).value = "");
+      } catch (e) {
+        console.error(e);
+        alert("เกิดข้อผิดพลาด กรุณาลองใหม่");
+      }
+    }
+
+    // แสดงสถานะ
+    async function loadStatus() {
+      const phone = document.getElementById("status-phone").value.trim();
+      const list  = document.getElementById("status-list");
+      list.innerHTML = "";
+
+      if (phone.length!==10) {
+        list.innerHTML = "<p style='color:#d33;'>กรุณากรอกเบอร์ 10 หลัก</p>";
+        return;
+      }
+
+      const q    = query(collection(db,"repair_requests"), where("phone","==",phone));
+      const snap = await getDocs(q);
+
+      if (snap.empty) {
+        list.innerHTML = "<p>ไม่พบคำร้องใดๆ</p>";
+        return;
+      }
+
+      snap.forEach(doc => {
+        const d = doc.data();
+        const badgeClass = d.status==="รอดำเนินการ"
+          ? "badge-pending"
+          : d.status==="กำลังดำเนินการ"
+            ? "badge-inprogress"
+            : "badge-done";
+
+        const item = document.createElement("div");
+        item.className = "status-item";
+        item.innerHTML = `
+          <div class="status-date">
+            <span>${d.date} ⚡ ${d.description}</span>
+            <span class="status-badge ${badgeClass}">${d.status}</span>
+          </div>
+          <div class="status-desc">${d.description}</div>
+          <div class="status-addr">📍 ${d.address}</div>
+        `;
+        list.append(item);
+      });
+    }
+
+    document.getElementById("report-btn").onclick    = sendReport;
+    document.getElementById("status-phone").oninput  = loadStatus;
+    document.getElementById("to-status").onclick     = ()=> {
+      document.getElementById("status-card")
+              .scrollIntoView({ behavior:"smooth" });
+    };
+  </script>
+</body>
+</html>

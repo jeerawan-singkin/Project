@@ -7,12 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Roboto', sans-serif;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Roboto', sans-serif; }
 
     body {
       height: 100vh;
@@ -34,7 +29,6 @@
 
     .left-panel {
       flex: 1;
-      background: transparent;
       color: white;
       display: flex;
       justify-content: center;
@@ -43,18 +37,11 @@
       border-right: 1px solid rgba(255,255,255,0.2);
     }
 
-    .left-panel h1 {
-      font-size: 28px;
-      margin-bottom: 10px;
-    }
-
-    .left-panel span {
-      font-size: 14px;
-    }
+    .left-panel h1 { font-size: 28px; margin-bottom: 10px; }
+    .left-panel span { font-size: 14px; }
 
     .right-panel {
       flex: 1;
-      background: transparent;
       padding: 60px;
       display: flex;
       flex-direction: column;
@@ -99,9 +86,7 @@
       margin-bottom: 20px;
     }
 
-    .remember-forgot input {
-      margin-right: 5px;
-    }
+    .remember-forgot input { margin-right: 5px; }
 
     .login-btn {
       background-color: #84046f;
@@ -115,7 +100,7 @@
     }
 
     .login-btn:hover {
-      background-color: #004a94;
+      background-color: #6c045d;
     }
   </style>
 </head>
@@ -149,7 +134,7 @@
     </div>
   </div>
 
-  <!-- 🔹 Firebase + Firestore Login Script -->
+  <!-- 🔹 Firebase Login Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
@@ -167,7 +152,6 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-//login//
     async function login() {
       const username = document.getElementById("username").value.trim();
       const password = document.getElementById("password").value.trim();
@@ -178,20 +162,25 @@
       }
 
       const q = query(
-        collection(db, "admin"),
+        collection(db, "admin"), // ✅ ชื่อ collection ที่คุณสร้างใน Firestore
         where("username", "==", username),
         where("password", "==", password)
       );
 
-//เงื่อนไขของการใส่รหัส//
       const querySnapshot = await getDocs(q);
       if (!querySnapshot.empty) {
         const user = querySnapshot.docs[0].data();
         if (user.role === "admin") {
           alert("✅ Login สำเร็จ! ยินดีต้อนรับแอดมิน");
-          window.location.href = "/admin/dashboard.html";
+
+          // ✅ บันทึกสถานะ login ลง localStorage
+          localStorage.setItem("loggedIn", "true");
+          localStorage.setItem("username", username);
+
+          // ✅ เข้าสู่หน้า dashboard
+          window.location.href = "dashboard.html"; // ระวัง path ให้ถูก
         } else {
-          alert("✅ Login สำเร็จ แต่ไม่ใช่แอดมิน");
+          alert("✅ Login สำเร็จ แต่คุณไม่ใช่แอดมิน");
         }
       } else {
         alert("❌ Username หรือ Password ไม่ถูกต้อง");
@@ -203,3 +192,4 @@
 
 </body>
 </html>
+
